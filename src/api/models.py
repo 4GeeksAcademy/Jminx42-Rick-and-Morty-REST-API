@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-import enum
+
 
 db = SQLAlchemy()
 
@@ -81,16 +81,21 @@ class Episode(db.Model):
         }
 
 
-class Category(enum.Enum):
-    character = "character"
-    episode = "episode"
-    location = "location"
-
-
 class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    # category = db.Column(db.Enum(Category), server_default="character")
     location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=True)
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable=True)
     episode_id = db.Column(db.Integer, db.ForeignKey("episode.id"), nullable=True)
+
+    def __repr__(self):
+        return f"<Favorite {self.id}>"
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "location_id": self.location_id,
+            "episode_id": self.episode_id,
+        }

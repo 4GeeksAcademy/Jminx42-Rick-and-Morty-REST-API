@@ -8,13 +8,13 @@ from api.utils import generate_sitemap, APIException
 api = Blueprint("api", __name__)
 
 
-@api.route("/hello", methods=["POST", "GET"])
-def handle_hello():
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-    }
+# @api.route("/hello", methods=["POST", "GET"])
+# def handle_hello():
+#     response_body = {
+#         "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+#     }
 
-    return jsonify(response_body), 200
+#     return jsonify(response_body), 200
 
 
 @api.route("/character", methods=["GET"])
@@ -85,14 +85,86 @@ def get_all_users():
     return jsonify({"users": user_serialized}), 200
 
 
+# Get user favorites -- needs work!!!
 @api.route("/users/favorites/<int:user_id>", methods=["GET"])
-def get_all_user_favorites(user_id):
-    user = User.query.get(user_id)
+def get_all_user_favorites_by_user_id(user_id):
+    favorites = Favorite.query.filter_by(user_id=user_id).all()
 
-    user_serialized = [user.serialize() for user in users]
+    favorites_serialized = [favorite.serialize() for favorite in favorites]
     print("@@@@@@@@@@@@@@@@@@@")
-    print(users)
-    print(user_serialized)
+    print(favorites)
     print("@@@@@@@@@@@@@@@@@@@")
 
-    return jsonify({"users": user_serialized}), 200
+    return jsonify({"favorites": favorites_serialized}), 200
+
+
+@api.route("/favorite/character/<int:character_id>", methods=["POST"])
+def create_charcter(character_id):
+    body = request.json
+    new_character = Character(
+        id=body[character_id],
+        name=body["name"],
+        status=body["status"],
+        species=body["species"],
+    )
+    db.session.add(new_character)
+    db.session.commit()
+
+    return jsonify({"character": "created"}), 200
+
+
+@api.route("/favorite/episode/<int:episode_id>", methods=["POST"])
+def create_episode(episode_id):
+    body = request.json
+    new_episode = Episode(
+        id=body[episode_id],
+        name=body["name"],
+        air_date=body["air_date"],
+        episode=body["episode"],
+    )
+    db.session.add(new_episode)
+    db.session.commit()
+
+    return jsonify({"episode": "created"}), 200
+
+
+@api.route("/favorite/location/<int:location_id>", methods=["POST"])
+def create_location(location_id):
+    body = request.json
+    new_location = Location(
+        id=body[location_id],
+        name=body["name"],
+        type=body["type"],
+        dimension=body["dimension"],
+    )
+    db.session.add(new_location)
+    db.session.commit()
+
+    return jsonify({"location": "created"}), 200
+
+
+@api.route("/favorite/character/<int:character_id>", methods=["DELETE"])
+def delete_character(character_id):
+    character = Character.query.get(character_id)
+    if not character:
+        return jsonify({"error": "No character found with this id"}), 400
+    db.session.delete(character)
+    db.session.commit()
+
+
+@api.route("/favorite/episode/<int:episode_id>", methods=["DELETE"])
+def delete_episode(episode_id):
+    episode = Episode.query.get(episode_id)
+    if not episode:
+        return jsonify({"error": "No episode found with this id"}), 400
+    db.session.delete(episode)
+    db.session.commit()
+
+
+@api.route("/favorite/location/<int:location_id>", methods=["DELETE"])
+def delete_location(location_id):
+    location = Location.query.get(location_id)
+    if not location:
+        return jsonify({"error": "No location found with this id"}), 400
+    db.session.delete(location)
+    db.session.commit()
