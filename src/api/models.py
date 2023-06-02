@@ -10,7 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     # has_favorite = db.Column(db.Boolean, unique=False)
-    favorite = db.relationship("Favorite", backref="user")
+    favorites = db.relationship("Favorite", backref="user")
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -29,7 +29,7 @@ class Location(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     type = db.Column(db.String(120), nullable=False)
     dimension = db.Column(db.String(120), nullable=False)
-    favorite = db.relationship("Favorite", backref="location")
+    favorites = db.relationship("Favorite", backref="location")
 
     def __repr__(self):
         return f"<Location {self.name}>"
@@ -48,7 +48,7 @@ class Character(db.Model):
     name = db.Column(db.String(120), nullable=False, unique=True)
     status = db.Column(db.String(120), nullable=False)
     species = db.Column(db.String(120), nullable=False)
-    favorite = db.relationship("Favorite", backref="character")
+    favorites = db.relationship("Favorite", backref="character")
 
     def __repr__(self):
         return f"<Character {self.name}>"
@@ -67,7 +67,7 @@ class Episode(db.Model):
     name = db.Column(db.String(120), nullable=False, unique=True)
     air_date = db.Column(db.String(20), nullable=False)
     episode = db.Column(db.String(120), nullable=False)
-    favorite = db.relationship("Favorite", backref="episode")
+    favorites = db.relationship("Favorite", backref="episode")
 
     def __repr__(self):
         return f"<Episode {self.name}>"
@@ -83,12 +83,11 @@ class Episode(db.Model):
 
 class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=True)
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable=True)
     episode_id = db.Column(db.Integer, db.ForeignKey("episode.id"), nullable=True)
-
+   
     def __repr__(self):
         return f"<Favorite {self.id}>"
 
